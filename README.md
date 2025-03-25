@@ -1,19 +1,22 @@
 # migrate-hack
 
-**migrate-hack** is a tool designed to run Rails migrations in a deterministic, commit-by-commit manner. It’s especially useful in CI/CD pipelines or containerized environments where migrations must be applied sequentially and reproducibly.
+**migrate-hack** runs migrations on an already seeded database, without risks of loosing data. It's a tool designed to run Rails migrations in a deterministic, commit-by-commit manner. It’s especially useful in CI/CD pipelines or containerized environments where migrations must be applied sequentially and reproducibly.
 
-## Features
+## Conflicts
 
-- **Ordered Migrations:**  
-  Automatically detects and orders pending Rails migrations based on commit timestamps.
+Essentially, migration conflicts occur when the schema file is updated but still validates old migrations. This process requires columns that haven’t yet been created, leading to various inconsistencies.
 
-- **Environment Injection (`--env`):**  
+To resolve this, the migration should run with the schema version that was in place when it was created and with the same gems that influenced the Rails build at that time. For this purpose, we use git as a time machine—revisiting the last commit for that migration and running it as if going back in time.
+
+## Args
+
+- **(`--env`):**  
   Load a specified `.env` file to provide the necessary environment variables during the migration process.
 
-- **File Copying (`--copy`):**  
-  Copy files from a designated directory into the project before running migrations. This is especially useful for overriding credentials or configuration files that are not stored in the repository.
+- **(`--copy`):**  
+  Copy the files from a designated directory into the project before running migrations. This is especially useful for overriding credentials or configuration files that are not stored in the repository.
 
-- **Automated Git Handling:**  
+## Git Handling
   For each pending migration, the tool:
   - Checks out the commit where the migration was introduced,
   - Installs necessary dependencies,
@@ -87,30 +90,9 @@ To run migrations while loading environment variables from `tmp/.env` and copyin
 migrate-hack --env tmp/.env --copy tmp/untracked/
 ```
 
-## How It Works
-
-1. **Parameter Parsing:**  
-   The tool accepts command-line arguments either with an equal sign (e.g., `--env=tmp/.env`) or separated by a space (e.g., `--env tmp/.env`). It processes these to determine the paths for the environment file and the directory for file copying.
-
-2. **Environment Loading:**  
-   If the `--env` option is provided, the tool sources the specified `.env` file so that its environment variables are available throughout the migration process.
-
-3. **File Copying:**  
-   When the `--copy` option is used, the tool verifies that the specified directory exists. It then copies the contents into the current working directory, preserving the folder structure. This allows you to override or supply files (like credentials or configuration files) that are not committed to your repository.
-
-4. **Migration Execution:**  
-   The tool identifies pending Rails migrations and, for each migration:
-   - Retrieves the commit in which the migration was introduced.
-   - Checks out that specific commit.
-   - Installs dependencies using `bundle install`.
-   - Executes the migration with `rails db:migrate:up VERSION=<migration_version>`.
-   - Returns to the main branch after cleaning up any local changes.
-   
-   This ensures that each migration is run in the context of the commit where it was originally created, preserving consistency and reproducibility.
-
 ## Contributing
 
-Contributions are welcome! Please open issues or submit pull requests on our [GitHub repository](https://github.com/your-repository).
+Contributions are welcome! Please open issues or submit pull requests on our [GitHub repository](https://github.com/omelao/migrate-hack).
 
 ## License
 
