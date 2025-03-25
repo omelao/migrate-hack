@@ -1,5 +1,5 @@
 ⚠️ **Warning:**  
-This gem modifies the files in the repository where it is executed but then restores everything to normal.  
+This gem modifies the files in the repository where it is executed according to git history, but then restores everything to normal.  
 **Do not run it on servers that are actively serving the application. Run it in parallel.**
 
 # migrate-hack
