@@ -1,3 +1,7 @@
+⚠️ **Warning:**  
+This gem modifies the files in the repository where it is executed but then restores everything to normal.  
+**Do not run it on servers that are actively serving the application. Run it in parallel.**
+
 # migrate-hack
 
 **migrate-hack** runs migrations on an already seeded database, without risks of loosing data. It's a tool designed to run Rails migrations in a deterministic, commit-by-commit manner. It’s especially useful in CI/CD pipelines or containerized environments where migrations must be applied sequentially and reproducibly.
