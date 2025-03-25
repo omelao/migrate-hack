@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+exec("bash", File.expand_path("migrate-hack.sh", __dir__), *ARGV)
