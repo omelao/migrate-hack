@@ -34,8 +34,6 @@ if [ -n "$ENV_FILE" ]; then
   set -a
   source "$ENV_FILE"
   set +a
-else
-  echo "[env] No .env file specified"
 fi
 
 if [ -n "$COPY_DIR" ]; then
@@ -47,8 +45,6 @@ if [ -n "$COPY_DIR" ]; then
     echo "[copy] Directory not found: $COPY_DIR"
     exit 1
   fi
-else
-  echo "[copy] No copy directory specified"
 fi
 
 if [[ -n $(git status --porcelain) ]]; then
