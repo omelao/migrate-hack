@@ -2,7 +2,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'migrate-hack'
   spec.authors       = ['Carlos Zillner']
   spec.email         = ['carlos@function.ws']
-  spec.version       = '0.1.3'
+  spec.version       = '0.1.4'
 
   spec.summary       = 'Runs old migrations without conflicts'
   spec.description = <<~DESC

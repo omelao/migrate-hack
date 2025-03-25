@@ -3,6 +3,11 @@
 ENV_FILE=""
 COPY_DIR=""
 
+if [[ -n $(git status --porcelain) ]]; then
+  echo "[error] There are modified, deleted, or untracked files in the repository. Please resolve these changes before continuing."
+  exit 1
+fi
+
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
@@ -47,11 +52,6 @@ if [ -n "$COPY_DIR" ]; then
   fi
 fi
 
-if [[ -n $(git status --porcelain) ]]; then
-  echo "[error] There are modified, deleted, or untracked files in the repository. Please resolve these changes before continuing."
-  exit 1
-fi
-
 echo "Detecting pending migrations..."
 
 # 1. Get pending migrations list
@@ -85,13 +85,17 @@ while read -r TIMESTAMP MIGRATION COMMIT; do
   echo -e "\033[1;32m - migrate\033[0m"
   bundle exec rails db:migrate:up VERSION=$MIGRATION
 
-  git stash -u > /dev/null
-  git stash drop > /dev/null
+  if [[ -n $(git status --porcelain) ]]; then
+    git stash -u > /dev/null
+    git stash drop > /dev/null
+  fi
   git checkout main > /dev/null
 done < <(sort -n "$TEMP_FILE")
 
-git stash -u > /dev/null
-git checkout main > /dev/null
+if [[ -n $(git status --porcelain) ]]; then
+  git stash -u > /dev/null
+  git stash drop > /dev/null
+fi
 
 bundle exec rails db:migrate:status | grep down
 
