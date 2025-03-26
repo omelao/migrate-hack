@@ -1,3 +1,5 @@
+# Migrate Hack
+
 [![Gem Version](https://badge.fury.io/rb/migrate-hack.svg?icon=si%3Arubygems)](https://badge.fury.io/rb/migrate-hack)
 
 ---
@@ -7,7 +9,9 @@ This gem modifies the files in the repository where it is executed according to 
 
 ---
 
-# migrate-hack
+[Installation](#installation) | [Usage](#usage) | [Changelog](CHANGELOG.md)
+
+---
 
 **migrate-hack** runs migrations on an already seeded database, without risks of loosing data. It's a tool designed to run Rails migrations in a deterministic, commit-by-commit manner. It’s especially useful in CI/CD pipelines or containerized environments where migrations must be applied sequentially and reproducibly.
 

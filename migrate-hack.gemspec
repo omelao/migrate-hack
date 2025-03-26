@@ -2,7 +2,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'migrate-hack'
   spec.authors       = ['Carlos Zillner']
   spec.email         = ['carlos@function.ws']
-  spec.version       = '0.1.5'
+  spec.version       = '0.1.6'
 
   spec.summary       = 'Runs old migrations without conflicts'
   spec.description = <<~EOF
@@ -20,4 +20,5 @@ Gem::Specification.new do |spec|
   spec.executables   = ["migrate-hack"]
   spec.metadata    = { 'source_code_uri' => 'https://github.com/omelao/migrate-hack' }
   spec.required_ruby_version = '>= 2.7.0'
+  spec.changelog_uri = "https://github.com/omelao/migrate-hack/blob/main/CHANGELOG.md"
 end

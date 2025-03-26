@@ -2,6 +2,7 @@
 
 ENV_FILE=""
 COPY_DIR=""
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 renew_git() {
   if [[ -n $(git status --porcelain) ]]; then
@@ -91,7 +92,7 @@ while read -r TIMESTAMP MIGRATION COMMIT; do
   bundle exec rails db:migrate:up VERSION=$MIGRATION
 
   renew_git
-  git checkout main > /dev/null
+  git checkout $CURRENT_BRANCH > /dev/null
 done < <(sort -n "$TEMP_FILE")
 
 renew_git
