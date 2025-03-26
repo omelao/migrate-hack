@@ -3,6 +3,13 @@
 ENV_FILE=""
 COPY_DIR=""
 
+renew_git() {
+  if [[ -n $(git status --porcelain) ]]; then
+    git stash -u > /dev/null
+    git stash drop > /dev/null
+  fi
+}
+
 if [[ -n $(git status --porcelain) ]]; then
   echo "[error] There are modified, deleted, or untracked files in the repository. Please resolve these changes before continuing."
   exit 1
@@ -73,10 +80,9 @@ for MIGRATION in $PENDING_MIGRATIONS; do
 done
 
 # 3. Order list by commit date
-cat $TEMP_FILE
-
 while read -r TIMESTAMP MIGRATION COMMIT; do
   echo -e "\033[1;32mRunning migration $MIGRATION on commit $COMMIT (timestamp $TIMESTAMP)...\033[0m"
+  renew_git
   CHECKOUT=$(git -c advice.detachedHead=false checkout "$COMMIT")
 
   cp -r "$COPY_DIR/." "$destination"
@@ -85,17 +91,11 @@ while read -r TIMESTAMP MIGRATION COMMIT; do
   echo -e "\033[1;32m - migrate\033[0m"
   bundle exec rails db:migrate:up VERSION=$MIGRATION
 
-  if [[ -n $(git status --porcelain) ]]; then
-    git stash -u > /dev/null
-    git stash drop > /dev/null
-  fi
+  renew_git
   git checkout main > /dev/null
 done < <(sort -n "$TEMP_FILE")
 
-if [[ -n $(git status --porcelain) ]]; then
-  git stash -u > /dev/null
-  git stash drop > /dev/null
-fi
+renew_git
 
 bundle exec rails db:migrate:status | grep down
 
