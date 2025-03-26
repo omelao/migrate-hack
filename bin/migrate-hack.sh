@@ -63,12 +63,11 @@ echo "Detecting pending migrations..."
 
 # 1. Get pending migrations list
 PENDING_MIGRATIONS=$(bundle exec rails db:migrate:status | grep down | awk '{ print $2 }')
+echo -e "\033[1;32mPending Migrations:\033[0m"
+echo $PENDING_MIGRATIONS
 
 # 2. [commit_date] [migration_id] [commit_hash]
 MIGRATION_LIST=""
-
-echo "Pending Migrations: $PENDING_MIGRATIONS"
-
 TEMP_FILE=$(mktemp)
 
 # Build the file
@@ -96,7 +95,6 @@ while read -r TIMESTAMP MIGRATION COMMIT; do
 done < <(sort -n "$TEMP_FILE")
 
 renew_git
-
 bundle exec rails db:migrate:status | grep down
 
 # Remove temp file
