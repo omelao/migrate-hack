@@ -18,7 +18,9 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir['bin/*']
   spec.executables   = ["migrate-hack"]
-  spec.metadata    = { 'source_code_uri' => 'https://github.com/omelao/migrate-hack' }
+  spec.metadata    = { 
+    'source_code_uri' => 'https://github.com/omelao/migrate-hack', 
+    'changelog_uri' => 'https://github.com/omelao/migrate-hack/blob/main/CHANGELOG.md' 
+  }
   spec.required_ruby_version = '>= 2.7.0'
-  spec.changelog_uri = "https://github.com/omelao/migrate-hack/blob/main/CHANGELOG.md"
 end
