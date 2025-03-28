@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Runs old migrations without conflicts'
   spec.description = <<~EOF
-    This gem checks out previous commits to run migrations, then restores everything back to normal.\n
+    This gem checks out previous git commits to run migrations, then restores everything back to normal.\n
   EOF
 
   spec.homepage      = 'https://rubygems.org/gems/migrate-hack'
