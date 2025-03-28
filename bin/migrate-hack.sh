@@ -11,11 +11,24 @@ renew_git() {
   fi
 }
 
+# BLOCKS
+
+# UNCOMITTED CHANGES
 if [[ -n $(git status --porcelain) ]]; then
-  echo "[error] There are modified, deleted, or untracked files in the repository. Please resolve these changes before continuing."
+  echo "⚠️ [ERROR] - There are modified, deleted, or untracked files in the repository. Please resolve these changes to continue."
   exit 1
 fi
 
+# SERVER RUNNING
+if [ -f tmp/pids/server.pid ]; then
+  PID=$(cat tmp/pids/server.pid)
+  if ps -p $PID > /dev/null; then
+    echo "⚠️ [ERROR] - Server Rails/Puma running on (PID: $PID). Please, stop it or run on a parallel repository."
+    exit 1
+  fi
+fi
+
+# GETTING ARGS
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
@@ -42,6 +55,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# LOAD ENVIRONMENT
 if [ -n "$ENV_FILE" ]; then
   echo "[env] Loading environment from $ENV_FILE"
   set -a
@@ -49,6 +63,7 @@ if [ -n "$ENV_FILE" ]; then
   set +a
 fi
 
+# COPY FILES
 if [ -n "$COPY_DIR" ]; then
   destination=$(pwd)
   if [ -d "$COPY_DIR" ]; then
@@ -62,24 +77,23 @@ fi
 
 echo "Detecting pending migrations..."
 
-# 1. Get pending migrations list
+# GET PENDING MIGRATIONS
 PENDING_MIGRATIONS=$(bundle exec rails db:migrate:status | grep down | awk '{ print $2 }')
 echo -e "\033[1;32mPending Migrations:\033[0m"
 echo $PENDING_MIGRATIONS
-
-# 2. [commit_date] [migration_id] [commit_hash]
 MIGRATION_LIST=""
 TEMP_FILE=$(mktemp)
 
-# Build the file
+# BUILD LIST OF MIGRATIONS AND COMMITS
 for MIGRATION in $PENDING_MIGRATIONS; do
   FILE=$(find db/migrate -name "${MIGRATION}_*.rb")
   COMMIT_HASH=$(git log -n 1 --pretty=format:%H -- "$FILE")
   COMMIT_DATE=$(git show -s --format=%ct "$COMMIT_HASH")
+  # [commit_date] [migration_id] [commit_hash]
   echo "$COMMIT_DATE $MIGRATION $COMMIT_HASH" >> "$TEMP_FILE"
 done
 
-# 3. Order list by commit date
+# ORDER BY COMMIT DATE
 while read -r TIMESTAMP MIGRATION COMMIT; do
   echo -e "\033[1;32mRunning migration $MIGRATION on commit $COMMIT (timestamp $TIMESTAMP)...\033[0m"
   renew_git
@@ -95,8 +109,11 @@ while read -r TIMESTAMP MIGRATION COMMIT; do
   git checkout $CURRENT_BRANCH > /dev/null
 done < <(sort -n "$TEMP_FILE")
 
+# RESTORING YOUR REPO
 renew_git
+
+# CHECKING STATUS
 bundle exec rails db:migrate:status | grep down
 
-# Remove temp file
+# TRASH
 rm -f "$TEMP_FILE"
