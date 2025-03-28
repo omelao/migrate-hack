@@ -87,7 +87,7 @@ while read -r TIMESTAMP MIGRATION COMMIT; do
 
   cp -r "$COPY_DIR/." "$destination"
 
-  CHECKOUT=$(bundle install > /dev/null)
+  bundle install > /dev/null
   echo -e "\033[1;32m - migrate\033[0m"
   bundle exec rails db:migrate:up VERSION=$MIGRATION
 
