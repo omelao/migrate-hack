@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Runs old migrations without conflicts'
   spec.description = <<~EOF
-    Ideal for deterministic pipelines, CI/CD, or containers that apply migrations step by step.\n
+    Runs many migrations without conflicts even working in. It is useful for deterministic pipelines, CI/CD, or containers that apply migrations.\n
     --------------------------------\n
     ⚠️ Warning: This gem modifies the files in the repository where it is executed according to git history, but then restores everything to normal.
     Do not run it on servers that are actively serving the application.

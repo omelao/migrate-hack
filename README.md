@@ -3,6 +3,10 @@
 [![Gem Version](https://badge.fury.io/rb/migrate-hack.svg?icon=si%3Arubygems)](https://badge.fury.io/rb/migrate-hack)
 
 ---
+
+<img src="public/img/explain.png" width="800" />
+
+---
 ⚠️ **Warning:**  
 This gem modifies the files in the repository where it is executed according to git history, but then restores everything to normal.  
 **Do not run it on servers that are actively serving the application. Run it in parallel.**
