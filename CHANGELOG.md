@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - 2025-03-27
+### Fixed
+- Add new description
+
 ## [0.1.7] - 2025-03-27
 ### Fixed
 - Add bundle install debug message

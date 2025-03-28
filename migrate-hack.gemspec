@@ -2,15 +2,11 @@ Gem::Specification.new do |spec|
   spec.name          = 'migrate-hack'
   spec.authors       = ['Carlos Zillner']
   spec.email         = ['carlos@function.ws']
-  spec.version       = '0.1.7'
+  spec.version       = '0.1.8'
 
   spec.summary       = 'Runs old migrations without conflicts'
   spec.description = <<~EOF
-    Runs many migrations without conflicts even working in. It is useful for deterministic pipelines, CI/CD, or containers that apply migrations.\n
-    --------------------------------\n
-    ⚠️ Warning: This gem modifies the files in the repository where it is executed according to git history, but then restores everything to normal.
-    Do not run it on servers that are actively serving the application.
-    Run it in parallel.\n
+    This gem checks out previous commits to run migrations, then restores everything back to normal.\n
   EOF
 
   spec.homepage      = 'https://rubygems.org/gems/migrate-hack'

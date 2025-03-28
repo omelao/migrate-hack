@@ -8,7 +8,7 @@
 
 ---
 ⚠️ **Warning:**  
-This gem modifies the files in the repository where it is executed according to git history, but then restores everything to normal.  
+This gem checks out previous commits to run migrations, then restores everything back to normal.
 **Do not run it on servers that are actively serving the application. Run it in parallel.**
 
 ---
