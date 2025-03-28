@@ -17,44 +17,6 @@ This gem checks out previous commits to run migrations, then restores everything
 
 ---
 
-**migrate-hack** runs migrations on an already seeded database, without risks of loosing data. It's a tool designed to run Rails migrations in a deterministic, commit-by-commit manner. It’s especially useful in CI/CD pipelines or containerized environments where migrations must be applied sequentially and reproducibly.
-
-## Conflicts
-
-Essentially, migration conflicts occur when the schema file is updated but still validates old migrations. This process requires columns that haven’t yet been created, leading to various inconsistencies.
-
-To resolve this, the migration should run with the schema version that was in place when it was created and with the same gems that influenced the Rails build at that time. For this purpose, we use git as a time machine—revisiting the last commit for that migration and running it as if going back in time.
-
-## Args
-
-- **(`--env`):**  
-  Load a specified `.env` file to provide the necessary environment variables during the migration process.
-
-- **(`--copy`):**  
-  Copy the files from a designated directory into the project before running migrations. This is especially useful for overriding credentials or configuration files that are not stored in the repository.
-
-## Git Handling
-  For each pending migration, the tool:
-  - Checks out the commit where the migration was introduced,
-  - Installs necessary dependencies,
-  - Runs the migration,
-  - And then returns to the main branch.
-
-## Dependencies
-
-- **Git:**  
-  migrate-hack relies on Git to retrieve commit information and perform checkouts. **Ensure that Git is installed** and available in your system’s PATH.
-
-- **Ruby and Bundler:**  
-  Ruby (and Bundler) are required for installing the gem and running Rails commands.
-
-- **Bash:**  
-  The tool uses a shell script as part of its logic, so a compatible Bash interpreter is required.
-
-## Repository State
-
-For migrate-hack to work correctly, the repository must be in a clean state (with no uncommitted changes). This ensures that Git operations (such as stashing, checking out commits, and reverting to the main branch) function as expected. Before running the tool, commit or stash any changes in your repository.
-
 ## Installation
 
 You can install migrate-hack via RubyGems:
@@ -74,6 +36,8 @@ Then run:
 ```bash
 bundle install
 ```
+
+---
 
 ## Usage
 
@@ -106,6 +70,54 @@ To run migrations while loading environment variables from `tmp/.env` and copyin
 ```bash
 migrate-hack --env tmp/.env --copy tmp/untracked/
 ```
+
+---
+
+## Conflicts
+
+Essentially, migration conflicts occur when the schema file is updated but still validates old migrations. This process requires columns that haven’t yet been created, leading to various inconsistencies.
+
+To resolve this, the migration should run with the schema version that was in place when it was created and with the same gems that influenced the Rails build at that time. For this purpose, we use git as a time machine—revisiting the last commit for that migration and running it as if going back in time.
+
+---
+
+## Args
+
+- **(`--env`):**  
+  Load a specified `.env` file to provide the necessary environment variables during the migration process.
+
+- **(`--copy`):**  
+  Copy the files from a designated directory into the project before running migrations. This is especially useful for overriding credentials or configuration files that are not stored in the repository.
+
+---
+
+## Git Handling
+  For each pending migration, the tool:
+  - Checks out the commit where the migration was introduced,
+  - Installs necessary dependencies,
+  - Runs the migration,
+  - And then returns to the main branch.
+
+---
+
+## Dependencies
+
+- **Git:**  
+  migrate-hack relies on Git to retrieve commit information and perform checkouts. **Ensure that Git is installed** and available in your system’s PATH.
+
+- **Ruby and Bundler:**  
+  Ruby (and Bundler) are required for installing the gem and running Rails commands.
+
+- **Bash:**  
+  The tool uses a shell script as part of its logic, so a compatible Bash interpreter is required.
+
+---
+
+## Repository State
+
+For migrate-hack to work correctly, the repository must be in a clean state (with no uncommitted changes). This ensures that Git operations (such as stashing, checking out commits, and reverting to the main branch) function as expected. Before running the tool, commit or stash any changes in your repository.
+
+---
 
 ## Contributing
 
