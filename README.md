@@ -43,6 +43,10 @@ bundle install
 
 Once installed, the executable `migrate-hack` will be available in your PATH. Use it with the following options:
 
+```bash
+  migrate-hack
+```
+
 ### Command-Line Arguments
 
 - **`--env [FILE]`**  
