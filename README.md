@@ -4,11 +4,11 @@
 
 ---
 
-<img src="public/img/explain.png" width="800" />
+<img src="public/img/explain-rebuild.png" width="800" />
 
 ---
 
-<img src="public/img/explain-rebuild.png" width="800" />
+<img src="public/img/explain.png" width="800" />
 
 ---
 ⚠️ **Warning:**  
