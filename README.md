@@ -7,11 +7,6 @@
 <img src="public/img/explain-rebuild.png" width="400" /> <img src="public/img/explain.png" width="400" />
 
 ---
-⚠️ **Warning:**  
-This gem checks out previous commits to run migrations, then restores everything back to normal.
-**Do not run it on servers that are actively serving the application. Run it in parallel.**
-
----
 
 [Installation](#installation) | [Usage](#usage) | [Changelog](CHANGELOG.md)
 
