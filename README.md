@@ -4,7 +4,7 @@
 
 ---
 
-<img src="public/img/explain-rebuild.png" width="420" /> <img src="public/img/explain.png" width="420" />
+<img src="public/img/explain-rebuild.png" width="400" /> <img src="public/img/explain.png" width="400" />
 
 ---
 ⚠️ **Warning:**  
