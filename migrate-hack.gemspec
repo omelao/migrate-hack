@@ -2,11 +2,11 @@ Gem::Specification.new do |spec|
   spec.name          = 'migrate-hack'
   spec.authors       = ['Carlos Zillner']
   spec.email         = ['carlos@function.ws']
-  spec.version       = '0.1.9'
+  spec.version       = '0.2.0'
 
   spec.summary       = 'Run any amount of migrations without conflicts'
   spec.description = <<~EOF
-    This gem checks out previous git commits to run migrations, then restores everything back to normal.\n
+    This gem rewinds your commits to apply migrations safely, fixes a bunch of common issues, and then puts everything back the way it was.\n
   EOF
 
   spec.homepage      = 'https://rubygems.org/gems/migrate-hack'

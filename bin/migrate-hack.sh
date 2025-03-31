@@ -23,8 +23,19 @@ fi
 if [ -f tmp/pids/server.pid ]; then
   PID=$(cat tmp/pids/server.pid)
   if ps -p $PID > /dev/null; then
-    echo "⚠️ [ERROR] - Server Rails/Puma running on (PID: $PID). Please, stop it or run on a parallel repository."
-    exit 1
+    echo "🔍 Server is running on PID: $PID. Checking code reload settings..."
+
+    # Verifica se cache_classes está true ou false
+    CACHE_CLASSES=$(rails runner "puts Rails.application.config.cache_classes")
+    EAGER_LOAD=$(rails runner "puts Rails.application.config.eager_load")
+
+    if [ "$CACHE_CLASSES" = "false" ]; then
+      echo "⚠️ [ERROR] - Server Rails/Puma is running with cache_classes=false (code reload ENABLED)."
+      echo "💡 Please stop the server or use a separate repo/branch to avoid conflicts."
+      exit 1
+    else
+      echo "✅ Server is running, but code reload is DISABLED (cache_classes=$CACHE_CLASSES, eager_load=$EAGER_LOAD). Safe to continue."
+    fi
   fi
 fi
 
