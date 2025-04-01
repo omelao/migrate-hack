@@ -1,13 +1,74 @@
 #!/usr/bin/env bash
 
+# This script is designed to run pending migrations in a Rails application
+# by checking out the commit where each migration was created.
+# It also allows loading environment variables from a specified file and
+# copying files from a specified directory to the current one.
+# Usage: ./migrate-hack.sh [--env=FILE] [--copy=DIR] [--help] [--version]
+
+VERSION="0.2.1"
 ENV_FILE=""
 COPY_DIR=""
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# GETTING ARGS
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    --env)
+      ENV_FILE="$2"
+      shift 2
+      ;;
+    --env=*)
+      ENV_FILE="${key#*=}"
+      shift
+      ;;
+    --copy)
+      COPY_DIR="$2"
+      shift 2
+      ;;
+    --copy=*)
+      COPY_DIR="${key#*=}"
+      shift
+      ;;
+    --help)
+      echo "Usage: migrate-hack [--env=FILE] [--copy=DIR] [--help] [--version]"
+      echo ""
+      echo "Options:"
+      echo "  --env=FILE     Load environment variables from the specified file"
+      echo "  --copy=DIR     Copy config and settings untracked files from the specified directory to the current one"
+      echo "  --help         Show this help message"
+      echo "  --version      Show script version"
+      exit 0
+      ;;
+    --version)
+      echo "migrate-hack ($VERSION)"
+      exit 0
+      ;;
+    *)
+      echo "[debug] Ignoring unknown argument: $1"
+      shift
+      ;;
+  esac
+done
 
 renew_git() {
   if [[ -n $(git status --porcelain) ]]; then
     git stash -u > /dev/null
     git stash drop > /dev/null
+  fi
+}
+
+copy_files() {
+  if [ -n "$COPY_DIR" ]; then
+    destination=$(pwd)
+    if [ -d "$COPY_DIR" ]; then
+      echo "[copy] Copying files from $COPY_DIR to $destination..."
+      cp -r "$COPY_DIR/." "$destination"
+    else
+      echo "[copy] Directory not found: $COPY_DIR"
+      exit 1
+    fi
   fi
 }
 
@@ -39,33 +100,6 @@ if [ -f tmp/pids/server.pid ]; then
   fi
 fi
 
-# GETTING ARGS
-while [[ $# -gt 0 ]]; do
-  key="$1"
-  case $key in
-    --env)
-      ENV_FILE="$2"
-      shift 2
-      ;;
-    --env=*)
-      ENV_FILE="${key#*=}"
-      shift
-      ;;
-    --copy)
-      COPY_DIR="$2"
-      shift 2
-      ;;
-    --copy=*)
-      COPY_DIR="${key#*=}"
-      shift
-      ;;
-    *)
-      echo "[debug] Ignoring unknown argument: $1"
-      shift
-      ;;
-  esac
-done
-
 # LOAD ENVIRONMENT
 if [ -n "$ENV_FILE" ]; then
   echo "[env] Loading environment from $ENV_FILE"
@@ -75,16 +109,7 @@ if [ -n "$ENV_FILE" ]; then
 fi
 
 # COPY FILES
-if [ -n "$COPY_DIR" ]; then
-  destination=$(pwd)
-  if [ -d "$COPY_DIR" ]; then
-    echo "[copy] Copying files from $COPY_DIR to $destination..."
-    cp -r "$COPY_DIR/." "$destination"
-  else
-    echo "[copy] Directory not found: $COPY_DIR"
-    exit 1
-  fi
-fi
+copy_files
 
 echo "Detecting pending migrations..."
 
@@ -110,7 +135,7 @@ while read -r TIMESTAMP MIGRATION COMMIT; do
   renew_git
   CHECKOUT=$(git -c advice.detachedHead=false checkout "$COMMIT")
 
-  cp -r "$COPY_DIR/." "$destination"
+  copy_files
 
   bundle install > /dev/null
   echo -e "\033[1;32m - migrate\033[0m"

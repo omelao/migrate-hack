@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-04-01
+### Fixed
+- Add Help Command
+- Add Version Command
+- Fix bug copying files
+
 ## [0.2.0] - 2025-03-31
 ### Fixed
 - Improved server check to block execution only when Rails is running with cache_classes = false (i.e., code reloading enabled)
