@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 This project adheres to the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-05-12
+### Fixed
+- Verifies if it's running inside a git repository
+
+## [0.2.3] - 2025-04-01
+### Fixed
+- Running again if there are newer migrations that fix older ones, limited to 5.
+
+## [0.2.2] - 2025-04-01
+### Fixed
+- Prevent copying root
+
 ## [0.2.1] - 2025-04-01
 ### Fixed
 - Add Help Command

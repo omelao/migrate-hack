@@ -6,9 +6,16 @@
 # copying files from a specified directory to the current one.
 # Usage: ./migrate-hack.sh [--env=FILE] [--copy=DIR] [--help] [--version]
 
-VERSION="0.2.1"
+VERSION="0.2.4"
 ENV_FILE=""
 COPY_DIR=""
+
+# VERIFY GIT REPO
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  echo "❌ [ERROR] - migrate-hack must be run inside a Git repository."
+  exit 1
+fi
+
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # GETTING ARGS
@@ -60,6 +67,11 @@ renew_git() {
 }
 
 copy_files() {
+  if [ -z "$COPY_DIR" ]; then
+    echo "[copy] No copy directory specified. Skipping file copy."
+    return
+  fi
+
   if [ -n "$COPY_DIR" ]; then
     destination=$(pwd)
     if [ -d "$COPY_DIR" ]; then
@@ -114,42 +126,58 @@ copy_files
 echo "Detecting pending migrations..."
 
 # GET PENDING MIGRATIONS
-PENDING_MIGRATIONS=$(bundle exec rails db:migrate:status | grep down | awk '{ print $2 }')
-echo -e "\033[1;32mPending Migrations:\033[0m"
-echo $PENDING_MIGRATIONS
-MIGRATION_LIST=""
-TEMP_FILE=$(mktemp)
+MAX_ATTEMPTS=5
+ATTEMPT=0
 
-# BUILD LIST OF MIGRATIONS AND COMMITS
-for MIGRATION in $PENDING_MIGRATIONS; do
-  FILE=$(find db/migrate -name "${MIGRATION}_*.rb")
-  COMMIT_HASH=$(git log -n 1 --pretty=format:%H -- "$FILE")
-  COMMIT_DATE=$(git show -s --format=%ct "$COMMIT_HASH")
-  # [commit_date] [migration_id] [commit_hash]
-  echo "$COMMIT_DATE $MIGRATION $COMMIT_HASH" >> "$TEMP_FILE"
+while true; do
+  if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+    echo "⚠️ [WARNING] Please, if you have many newer migrations that fix older ones, run again."
+    break
+  fi
+
+  PENDING_MIGRATIONS=$(bundle exec rails db:migrate:status | grep down | awk '{ print $2 }')
+
+  if [ -z "$PENDING_MIGRATIONS" ]; then
+    echo "✅ All migrations applied successfully."
+    break
+  fi
+
+  echo -e "\033[1;32mPending Migrations:\033[0m"
+  echo $PENDING_MIGRATIONS
+  MIGRATION_LIST=""
+  TEMP_FILE=$(mktemp)
+
+  # BUILD LIST OF MIGRATIONS AND COMMITS
+  for MIGRATION in $PENDING_MIGRATIONS; do
+    FILE=$(find db/migrate -name "${MIGRATION}_*.rb")
+    COMMIT_HASH=$(git log -n 1 --pretty=format:%H -- "$FILE")
+    COMMIT_DATE=$(git show -s --format=%ct "$COMMIT_HASH")
+    # [commit_date] [migration_id] [commit_hash]
+    echo "$COMMIT_DATE $MIGRATION $COMMIT_HASH" >> "$TEMP_FILE"
+  done
+
+  # ORDER BY COMMIT DATE
+  while read -r TIMESTAMP MIGRATION COMMIT; do
+    echo -e "\033[1;32mRunning migration $MIGRATION on commit $COMMIT (timestamp $TIMESTAMP)...\033[0m"
+    renew_git
+    CHECKOUT=$(git -c advice.detachedHead=false checkout "$COMMIT")
+
+    copy_files
+
+    bundle install > /dev/null
+    echo -e "\033[1;32m - migrate\033[0m"
+    bundle exec rails db:migrate:up VERSION=$MIGRATION
+
+    renew_git
+    git checkout $CURRENT_BRANCH > /dev/null
+  done < <(sort -n "$TEMP_FILE")
+
+  # RESTORING YOUR REPO
+  renew_git
+
+  # INCREMENT ATTEMPT COUNTER
+  ATTEMPT=$((ATTEMPT + 1))
 done
-
-# ORDER BY COMMIT DATE
-while read -r TIMESTAMP MIGRATION COMMIT; do
-  echo -e "\033[1;32mRunning migration $MIGRATION on commit $COMMIT (timestamp $TIMESTAMP)...\033[0m"
-  renew_git
-  CHECKOUT=$(git -c advice.detachedHead=false checkout "$COMMIT")
-
-  copy_files
-
-  bundle install > /dev/null
-  echo -e "\033[1;32m - migrate\033[0m"
-  bundle exec rails db:migrate:up VERSION=$MIGRATION
-
-  renew_git
-  git checkout $CURRENT_BRANCH > /dev/null
-done < <(sort -n "$TEMP_FILE")
-
-# RESTORING YOUR REPO
-renew_git
-
-# CHECKING STATUS
-bundle exec rails db:migrate:status | grep down
 
 # TRASH
 rm -f "$TEMP_FILE"
