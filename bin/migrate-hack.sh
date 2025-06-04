@@ -180,4 +180,6 @@ while true; do
 done
 
 # TRASH
-rm -f "$TEMP_FILE"
+if [ -n "$TEMP_FILE" ]; then
+  rm -f "$TEMP_FILE"
+fi
