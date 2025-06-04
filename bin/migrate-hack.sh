@@ -86,7 +86,7 @@ copy_files() {
 
 # BLOCKS
 
-# UNCOMITTED CHANGES
+# UNCOMMITTED CHANGES
 if [[ -n $(git status --porcelain) ]]; then
   echo "⚠️ [ERROR] - There are modified, deleted, or untracked files in the repository. Please resolve these changes to continue."
   exit 1
