@@ -98,7 +98,7 @@ if [ -f tmp/pids/server.pid ]; then
   if ps -p $PID > /dev/null; then
     echo "🔍 Server is running on PID: $PID. Checking code reload settings..."
 
-    # Verifica se cache_classes está true ou false
+    # Check whether cache_classes is true or false
     CACHE_CLASSES=$(rails runner "puts Rails.application.config.cache_classes")
     EAGER_LOAD=$(rails runner "puts Rails.application.config.eager_load")
 
