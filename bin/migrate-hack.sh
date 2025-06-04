@@ -73,14 +73,23 @@ copy_files() {
   fi
 
   if [ -n "$COPY_DIR" ]; then
+    if [ "$COPY_DIR" = "/" ]; then
+      echo "[copy] Refusing to copy from root directory"
+      exit 1
+    fi
     destination=$(pwd)
-    if [ -d "$COPY_DIR" ]; then
-      echo "[copy] Copying files from $COPY_DIR to $destination..."
-      cp -r "$COPY_DIR/." "$destination"
-    else
+    if [ ! -d "$COPY_DIR" ]; then
       echo "[copy] Directory not found: $COPY_DIR"
       exit 1
     fi
+    dir_size=$(du -sb "$COPY_DIR" | cut -f1)
+    MAX_SIZE=$((50 * 1024 * 1024))
+    if [ "$dir_size" -gt "$MAX_SIZE" ]; then
+      echo "[copy] Directory exceeds 50MB: $COPY_DIR"
+      exit 1
+    fi
+    echo "[copy] Copying files from $COPY_DIR to $destination..."
+    cp -r "$COPY_DIR/." "$destination"
   fi
 }
 
@@ -114,8 +123,13 @@ fi
 
 # LOAD ENVIRONMENT
 if [ -n "$ENV_FILE" ]; then
+  if [ ! -f "$ENV_FILE" ]; then
+    echo "[env] File not found: $ENV_FILE"
+    exit 1
+  fi
   echo "[env] Loading environment from $ENV_FILE"
   set -a
+  # shellcheck source=/dev/null
   source "$ENV_FILE"
   set +a
 fi
