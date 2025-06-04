@@ -104,7 +104,7 @@ fi
 # SERVER RUNNING
 if [ -f tmp/pids/server.pid ]; then
   PID=$(cat tmp/pids/server.pid)
-  if ps -p $PID > /dev/null; then
+if ps -p "$PID" > /dev/null; then
     echo "🔍 Server is running on PID: $PID. Checking code reload settings..."
 
     # Check whether cache_classes is true or false
@@ -157,8 +157,7 @@ while true; do
   fi
 
   echo -e "\033[1;32mPending Migrations:\033[0m"
-  echo $PENDING_MIGRATIONS
-  MIGRATION_LIST=""
+  echo "$PENDING_MIGRATIONS"
   TEMP_FILE=$(mktemp)
 
   # BUILD LIST OF MIGRATIONS AND COMMITS
@@ -174,16 +173,16 @@ while true; do
   while read -r TIMESTAMP MIGRATION COMMIT; do
     echo -e "\033[1;32mRunning migration $MIGRATION on commit $COMMIT (timestamp $TIMESTAMP)...\033[0m"
     renew_git
-    CHECKOUT=$(git -c advice.detachedHead=false checkout "$COMMIT")
+    git -c advice.detachedHead=false checkout "$COMMIT" >/dev/null
 
     copy_files
 
     bundle install > /dev/null
     echo -e "\033[1;32m - migrate\033[0m"
-    bundle exec rails db:migrate:up VERSION=$MIGRATION
+    bundle exec rails db:migrate:up VERSION="$MIGRATION"
 
     renew_git
-    git checkout $CURRENT_BRANCH > /dev/null
+    git checkout "$CURRENT_BRANCH" > /dev/null
   done < <(sort -n "$TEMP_FILE")
 
   # RESTORING YOUR REPO
