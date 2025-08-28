@@ -122,9 +122,5 @@ For migrate-hack to work correctly, the repository must be in a clean state (wit
 
 Contributions are welcome! Please open issues or submit pull requests on our [GitHub repository](https://github.com/omelao/migrate-hack).
 
-## License
-
-migrate-hack is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 ---
 
